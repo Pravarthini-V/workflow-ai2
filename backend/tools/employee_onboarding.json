@@ -1,0 +1,18 @@
+{
+  "workflow_embeddings": [
+    {
+      "workflow_id": "wf_emp_001",
+      "workflow_name": "Employee Onboarding Process",
+      "workflow_version": 2,
+      "embedding_text": "Complete employee onboarding workflow handling IT setup, HR documentation, benefits enrollment, and team introductions. Includes parallel steps for laptop provisioning, email setup, and access grants. Requires manager approval for equipment and HR verification for documents.",
+      "embedding_metadata": {
+        "total_steps": 8,
+        "step_types": ["task", "approval", "notification", "task", "task", "notification", "task", "completion"],
+        "avg_processing_time": "3 days",
+        "common_triggers": ["offer_acceptance", "start_date_confirmed"],
+        "key_entities": ["hr", "it_department", "manager", "new_employee"],
+        "tags": ["hr", "it", "onboarding", "employee"]
+      }
+    }
+  ]
+}

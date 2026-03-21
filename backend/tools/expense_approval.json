@@ -1,0 +1,58 @@
+{
+  "workflow_embeddings": [
+    {
+      "workflow_id": "wf_exp_001",
+      "workflow_name": "Expense Approval Process",
+      "workflow_version": 3,
+      "embedding_text": "Multi-tier expense approval workflow with country-specific routing. Handles expenses from $0 to $100,000 with different approval levels based on amount and location. Includes manager approval, finance review, and CEO approval steps with automatic notifications.",
+      "embedding_metadata": {
+        "total_steps": 5,
+        "step_types": ["approval", "notification", "approval", "notification", "task"],
+        "avg_processing_time": "2.5 hours",
+        "common_triggers": ["expense_submission", "receipt_upload"],
+        "key_entities": ["manager", "finance_team", "ceo", "employee"],
+        "tags": ["finance", "approval", "expense", "reimbursement"]
+      }
+    }
+  ],
+  "step_embeddings": [
+    {
+      "step_id": "step_exp_001",
+      "workflow_id": "wf_exp_001",
+      "step_name": "Manager Approval",
+      "step_type": "approval",
+      "embedding_text": "First-level approval step where direct manager reviews expense details. Checks for policy compliance, budget availability, and business justification. Can approve, reject, or request additional information. Sends email notification to manager with expense details."
+    },
+    {
+      "step_id": "step_exp_002",
+      "workflow_id": "wf_exp_001",
+      "step_name": "Finance Review",
+      "step_type": "approval",
+      "embedding_text": "Second-level review for international expenses or amounts over $1000. Finance team verifies tax compliance, currency conversion, and budget allocation. Can approve or flag for additional review."
+    }
+  ],
+  "rule_embeddings": [
+    {
+      "rule_id": "rule_exp_001",
+      "step_id": "step_exp_001",
+      "workflow_id": "wf_exp_001",
+      "rule_condition": "amount > 100 && country == 'US' && priority == 'High'",
+      "embedding_text": "Route to Finance Review when expense exceeds $100, is from US, and has High priority.",
+      "embedding_metadata": {
+        "priority": 1,
+        "condition_pattern": "high_value_domestic_priority"
+      }
+    },
+    {
+      "rule_id": "rule_exp_002",
+      "step_id": "step_exp_001",
+      "workflow_id": "wf_exp_001",
+      "rule_condition": "amount <= 100 || department == 'HR'",
+      "embedding_text": "Auto-approve small expenses under $100 or any HR department expenses.",
+      "embedding_metadata": {
+        "priority": 2,
+        "condition_pattern": "low_value_or_hr"
+      }
+    }
+  ]
+}

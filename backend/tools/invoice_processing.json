@@ -1,0 +1,190 @@
+{
+  "workflow_embeddings": [
+    {
+      "workflow_id": "wf_inv_001",
+      "workflow_name": "Invoice Processing Workflow",
+      "workflow_version": 2,
+      "embedding_text": "Automated invoice processing workflow that handles vendor invoices from receipt to payment. Includes OCR extraction, validation against purchase orders, approval routing, and payment scheduling. Handles exceptions for mismatched amounts, new vendors, and bulk invoices with automatic notification to accounts payable team.",
+      "embedding_metadata": {
+        "total_steps": 7,
+        "step_types": ["task", "task", "approval", "notification", "approval", "task", "notification"],
+        "avg_processing_time": "4.5 hours",
+        "common_triggers": ["email_receipt", "scanner_input", "api_upload"],
+        "key_entities": ["vendor", "purchase_order", "accounts_payable", "finance_manager"],
+        "tags": ["finance", "invoice", "vendor-payment", "ocr", "automation"]
+      }
+    }
+  ],
+  "step_embeddings": [
+    {
+      "step_id": "step_inv_001",
+      "workflow_id": "wf_inv_001",
+      "step_name": "OCR Document Processing",
+      "step_type": "task",
+      "embedding_text": "Automated step that extracts invoice data using OCR technology. Captures vendor name, invoice number, date, line items, amounts, and tax information. Handles multiple document formats including PDF, TIFF, and JPEG. Validates extracted data for completeness and accuracy."
+    },
+    {
+      "step_id": "step_inv_002",
+      "workflow_id": "wf_inv_001",
+      "step_name": "PO Validation",
+      "step_type": "task",
+      "embedding_text": "Matches extracted invoice data against existing purchase orders in the system. Verifies that goods/services were received, quantities match, and prices align with PO terms. Flags discrepancies for manual review and calculates variance percentages."
+    },
+    {
+      "step_id": "step_inv_003",
+      "workflow_id": "wf_inv_001",
+      "step_name": "AP Review",
+      "step_type": "approval",
+      "embedding_text": "Accounts Payable specialist reviews invoice for accuracy, proper coding, and policy compliance. Verifies vendor details, tax treatment, and approval limits. Can approve for payment, request corrections, or escalate to finance manager."
+    },
+    {
+      "step_id": "step_inv_004",
+      "workflow_id": "wf_inv_001",
+      "step_name": "Vendor Notification",
+      "step_type": "notification",
+      "embedding_text": "Sends automated notification to vendor confirming invoice receipt and expected payment date. For rejected invoices, sends detailed explanation of issues and required corrections. Supports email and vendor portal notifications."
+    },
+    {
+      "step_id": "step_inv_005",
+      "workflow_id": "wf_inv_001",
+      "step_name": "Finance Manager Approval",
+      "step_type": "approval",
+      "embedding_text": "Final approval for invoices exceeding $10,000 or with significant PO variances. Reviews exception cases, budget impact, and payment terms. Can approve with conditions or reject with comments for vendor dispute."
+    },
+    {
+      "step_id": "step_inv_006",
+      "workflow_id": "wf_inv_001",
+      "step_name": "Payment Scheduling",
+      "step_type": "task",
+      "embedding_text": "Automated scheduling of payment based on due date, payment terms, and cash flow optimization. Updates accounting system with payment date, method (ACH, wire, check), and creates payment batch for processing."
+    },
+    {
+      "step_id": "step_inv_007",
+      "workflow_id": "wf_inv_001",
+      "step_name": "Invoice Completion",
+      "step_type": "notification",
+      "embedding_text": "Final notification to stakeholders that invoice processing is complete. Updates dashboards, sends confirmation to requester, and archives invoice documents with complete audit trail."
+    }
+  ],
+  "rule_embeddings": [
+    {
+      "rule_id": "rule_inv_001",
+      "step_id": "step_inv_002",
+      "workflow_id": "wf_inv_001",
+      "rule_condition": "po_match == false || amount_variance > 0.1",
+      "embedding_text": "Route to AP Review when purchase order doesn't match or variance exceeds 10%. Requires manual review to resolve discrepancies between invoice and PO.",
+      "embedding_metadata": {
+        "priority": 1,
+        "condition_pattern": "po_mismatch_or_high_variance",
+        "trigger_count": 156
+      }
+    },
+    {
+      "rule_id": "rule_inv_002",
+      "step_id": "step_inv_002",
+      "workflow_id": "wf_inv_001",
+      "rule_condition": "po_match == true && amount_variance <= 0.1 && invoice_amount <= 10000",
+      "embedding_text": "Auto-approve invoices under $10,000 with good PO match and low variance. Direct routing to payment scheduling without manual review for efficiency.",
+      "embedding_metadata": {
+        "priority": 2,
+        "condition_pattern": "low_value_auto_approve",
+        "trigger_count": 892
+      }
+    },
+    {
+      "rule_id": "rule_inv_003",
+      "step_id": "step_inv_003",
+      "workflow_id": "wf_inv_001",
+      "rule_condition": "invoice_amount > 10000 || new_vendor == true || tax_issue == true",
+      "embedding_text": "Escalate to Finance Manager for high-value invoices over $10,000, new vendor setup, or tax-related issues. Requires executive oversight for these scenarios.",
+      "embedding_metadata": {
+        "priority": 1,
+        "condition_pattern": "high_value_or_exception",
+        "trigger_count": 234
+      }
+    },
+    {
+      "rule_id": "rule_inv_004",
+      "step_id": "step_inv_003",
+      "workflow_id": "wf_inv_001",
+      "rule_condition": "invoice_amount <= 10000 && new_vendor == false && tax_issue == false",
+      "embedding_text": "Standard invoices under $10,000 from existing vendors proceed directly to payment scheduling after AP review.",
+      "embedding_metadata": {
+        "priority": 2,
+        "condition_pattern": "standard_invoice",
+        "trigger_count": 567
+      }
+    },
+    {
+      "rule_id": "rule_inv_005",
+      "step_id": "step_inv_005",
+      "workflow_id": "wf_inv_001",
+      "rule_condition": "urgent_payment == true || vendor_priority == 'high'",
+      "embedding_text": "Flag urgent payments or high-priority vendors for expedited processing. Bypasses normal scheduling queue for immediate attention.",
+      "embedding_metadata": {
+        "priority": 1,
+        "condition_pattern": "urgent_processing",
+        "trigger_count": 89
+      }
+    },
+    {
+      "rule_id": "rule_inv_006",
+      "step_id": "step_inv_005",
+      "workflow_id": "wf_inv_001",
+      "rule_condition": "DEFAULT",
+      "embedding_text": "Default path for standard invoices through normal payment scheduling based on due date and payment terms.",
+      "embedding_metadata": {
+        "priority": 999,
+        "condition_pattern": "default_path",
+        "trigger_count": 1243
+      }
+    }
+  ],
+  "execution_embeddings": [
+    {
+      "execution_id": "exec_inv_001",
+      "workflow_id": "wf_inv_001",
+      "workflow_name": "Invoice Processing Workflow",
+      "embedding_text": "Successful processing of invoice INV-2024-089 from ABC Corp for $8,450. Complete match with PO-2024-123. Processed in 2.3 hours with auto-approval. Route: OCR → PO Validation (match) → AP Review (auto-approved) → Payment Scheduling → Completion.",
+      "embedding_metadata": {
+        "status": "completed",
+        "total_time": "2.3 hours",
+        "steps_completed": 5,
+        "input_data": {
+          "vendor": "ABC Corp",
+          "invoice_number": "INV-2024-089",
+          "amount": 8450,
+          "po_match": true
+        },
+        "outcome": "payment_scheduled"
+      }
+    },
+    {
+      "execution_id": "exec_inv_002",
+      "workflow_id": "wf_inv_001",
+      "workflow_name": "Invoice Processing Workflow",
+      "embedding_text": "Exception handling for invoice INV-2024-092 from XYZ Ltd with amount variance of 15%. Required finance manager review and vendor correction. Total processing time 2 days. Route: OCR → PO Validation (variance detected) → AP Review → Finance Manager Approval → Vendor Notification → Corrections Received → Reprocess.",
+      "embedding_metadata": {
+        "status": "completed_with_exceptions",
+        "total_time": "2 days",
+        "exception_step": "PO Validation",
+        "exception_reason": "amount_variance",
+        "variance_percentage": 15,
+        "resolution": "vendor_correction"
+      }
+    },
+    {
+      "execution_id": "exec_inv_003",
+      "workflow_id": "wf_inv_001",
+      "workflow_name": "Invoice Processing Workflow",
+      "embedding_text": "Failed OCR extraction for handwritten invoice from small vendor. Manual intervention required to enter data. Step: OCR Processing, Status: Failed, Error: Low confidence score (<60%) on key fields.",
+      "embedding_metadata": {
+        "status": "failed",
+        "failed_step": "OCR Processing",
+        "failure_reason": "low_ocr_confidence",
+        "retry_count": 2,
+        "resolution": "manual_entry_required"
+      }
+    }
+  ]
+}
